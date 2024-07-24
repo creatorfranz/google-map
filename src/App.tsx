@@ -1,35 +1,46 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Map, MapProps } from "@/components/map";
+import { Marker } from "@react-google-maps/api";
+import { useState } from "react";
+
+const options: PositionOptions = {
+  enableHighAccuracy: true,
+  timeout: 5000,
+  maximumAge: 0,
+};
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [mapProps, setMapProps] = useState<MapProps>();
+
+  const handleClick = () => {
+    navigator.geolocation.getCurrentPosition(
+      ({ coords: { latitude: lat, longitude: lng } }) =>
+        setMapProps((prev) => ({
+          ...prev,
+          center: { lat, lng },
+          boundType: "country",
+        })),
+
+      console.error,
+      options
+    );
+  };
 
   return (
-    <>
+    <div className="flex flex-row h-screen">
+      <Map {...mapProps} className="flex grow">
+        {mapProps?.center && <Marker position={mapProps.center} />}
+      </Map>
+
       <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+        <button
+          className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+          onClick={handleClick}
+        >
+          Get
         </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </div>
+  );
 }
 
-export default App
+export default App;
